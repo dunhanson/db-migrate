@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import site.dunhanson.db.migrate.baisc.DbType;
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -67,8 +68,12 @@ public class DbUtils {
         }
         sql = String.format(sql, tableName, primary);
         try {
-            return runner.query(sql, new MapListHandler()).get(0);
-        } catch (SQLException e) {
+            List<Map<String, Object>> list = runner.query(sql, new MapListHandler());
+            if(list == null) {
+                return null;
+            }
+            return list.get(0);
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
         return null;

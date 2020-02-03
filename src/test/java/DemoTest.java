@@ -1,4 +1,5 @@
 import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbutils.QueryRunner;
 import org.junit.Test;
 import site.dunhanson.db.migrate.baisc.Basic;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class DemoTest {
 
     @Test
@@ -45,19 +47,42 @@ public class DemoTest {
 
     @Test
     public void deltaImport() {
-        String tableName = "BXKC.T_REGISTRANT";
+        String tableName = "BXKC.T_COMPANY_QUALIFICATION";
         String mysqlTableName = DbUtils.getTableName(tableName, false, false);
         String mysqlPrimaryKey = "id";
         QueryRunner runner = DbUtils.getQueryRunner(MysqlUtils.dataSource);
         DbType type = DbType.MYSQL;
         Map<String, Object> map = DbUtils.getLastRecord(runner, type, mysqlTableName, mysqlPrimaryKey);
-        Object lastId = map.get(mysqlPrimaryKey);
+        Object lastId = 0;
+        if(map != null) {
+            lastId = map.get(mysqlPrimaryKey);
+        }
         //migrate
         List<String> condition = new ArrayList<>();
         condition.add(String.format("%s>%s", mysqlPrimaryKey, lastId));
         Basic basic = Basic.builder()
                 .tableName(tableName)
                 .condition(condition)
+                .build();
+        OracleUtils.migrateToMySQL(basic);
+    }
+
+    @Test
+    public void table1() {
+        String tableName = "BXKC.T_REGISTRANT";
+        Basic basic = Basic.builder()
+                .tableName(tableName)
+                .pageSize(10000)
+                .build();
+        OracleUtils.migrateToMySQL(basic);
+    }
+
+    @Test
+    public void table2() {
+        String tableName = "BXKC.T_COMPANY_QUALIFICATION";
+        Basic basic = Basic.builder()
+                .tableName(tableName)
+                .pageSize(10000)
                 .build();
         OracleUtils.migrateToMySQL(basic);
     }
