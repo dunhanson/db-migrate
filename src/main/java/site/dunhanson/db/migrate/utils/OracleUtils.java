@@ -129,10 +129,11 @@ public class OracleUtils {
                 stringBuffer.append("and ");
             });
         }
-        stringBuffer.append("ROWNUM < %s ");
-        stringBuffer.append(") t2 where t2.rowno >= %s");
+        stringBuffer.append("ROWNUM <= %s ");
+        stringBuffer.append(") t2 where t2.rowno > %s");
         String sql = stringBuffer.toString();
         sql = String.format(sql, tableName, endIndex, startIndex);
+        log.debug(sql);
         return sql;
     }
 
